@@ -2,6 +2,7 @@
 
 Automated tests for the Login and Cart features of [demoblaze.com](https://www.demoblaze.com/), written with Playwright and TypeScript.
 
+- Latest test report: [vietphamqq.github.io/demoblaze-playwright-e2e](https://vietphamqq.github.io/demoblaze-playwright-e2e/)
 - Test cases and bugs: [Google Sheet](https://docs.google.com/spreadsheets/d/1Po4H9u4_cFwjMFUTjdUKemLtL19jO8LmpKfadKfAXwE/edit?usp=sharing)
 - CI: [GitHub Actions](.github/workflows/e2e.yml)
 
@@ -40,7 +41,6 @@ A few other commands I use:
 npx playwright test --grep @cart --project=webkit     # run one tag on one browser
 npx playwright test --headed --workers=1              # watch the browser
 TEST_ENV=staging npx playwright test                  # load config/env/.env.staging
-npm run allure:generate && npm run allure:open        # Allure report (needs Java)
 ```
 
 Note: every run overwrites `reports/html`. If you want several projects in one report, run them in the same command.
@@ -85,7 +85,7 @@ Bugs I found have a test that expects the correct behaviour, tagged `@known-bug`
 
 Config (URLs, retries, video, credentials, performance budgets) lives in `config/env/.env.<TEST_ENV>`. Local overrides go in `config/env/.env.local`, which is git-ignored.
 
-Reports: console output, the Playwright HTML report (with trace, screenshot and video on failure) and Allure.
+Reports: locally you get the console output and the Playwright HTML report (with trace, screenshot and video on failure). Lighthouse writes to `reports/lighthouse/home.html` and k6 to `reports/k6/index.html`. In CI everything ends up on GitHub Pages, see below.
 
 ### Performance
 
@@ -100,7 +100,9 @@ I split it into two checks:
 - On main and nightly: the full `@regression` set, plus Lighthouse and k6.
 - It can also be started manually with a tag.
 
-Failed tests are retried twice in CI, and every job uploads its reports.
+Failed tests are retried twice in CI.
+
+On main and nightly runs the last job merges the Playwright results from all jobs into one report and publishes it to [GitHub Pages](https://vietphamqq.github.io/demoblaze-playwright-e2e/), together with the Lighthouse report and the k6 dashboard. Traces can be opened straight from there. If you fork this, turn it on under Settings → Pages → Source: GitHub Actions.
 
 ## Bugs found
 

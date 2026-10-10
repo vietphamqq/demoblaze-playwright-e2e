@@ -14,18 +14,9 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
 
-  reporter: [
-    ['list'],
-    ['html', { outputFolder: process.env.HTML_REPORT_DIR || 'reports/html', open: 'never' }],
-    [
-      'allure-playwright',
-      {
-        resultsDir: 'reports/allure-results',
-        environmentInfo: { TEST_ENV: config.testEnv, BASE_URL: config.baseUrl, NODE: process.version },
-      },
-    ],
-    ...(config.isCI ? ([['github']] as const) : []),
-  ],
+  reporter: config.isCI
+    ? [['list'], ['blob'], ['github']]
+    : [['list'], ['html', { outputFolder: process.env.HTML_REPORT_DIR || 'reports/html', open: 'never' }]],
 
   use: {
     baseURL: config.baseUrl,

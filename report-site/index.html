@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DemoBlaze test reports</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 640px;
+        margin: 40px auto;
+        padding: 0 16px;
+        color: #222;
+      }
+      li {
+        margin: 12px 0;
+      }
+      .meta {
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DemoBlaze test reports</h1>
+    <p class="meta">
+      Last run: __DATE__ · commit <a href="https://github.com/__REPO__/commit/__COMMIT__">__SHORT_COMMIT__</a>
+    </p>
+    <ul>
+      <li>
+        <a href="playwright/">Playwright report</a> – UI tests on Chromium, Firefox, WebKit and Pixel 7, plus
+        API tests
+      </li>
+      <li><a href="lighthouse/home.html">Lighthouse report</a> – home page</li>
+      <li><a href="k6/">k6 load test</a> – API under 5 virtual users for 30 seconds</li>
+    </ul>
+    <p class="meta">
+      <a href="https://github.com/__REPO__">Source code</a> ·
+      <a
+        href="https://docs.google.com/spreadsheets/d/1Po4H9u4_cFwjMFUTjdUKemLtL19jO8LmpKfadKfAXwE/edit?usp=sharing"
+        >Test cases</a
+      >
+    </p>
+  </body>
+</html>

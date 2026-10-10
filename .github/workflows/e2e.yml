@@ -47,9 +47,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: report-${{ matrix.project }}
-          path: reports
-          retention-days: 14
+          name: blob-${{ matrix.project }}
+          path: blob-report
+          retention-days: 7
 
   performance:
     if: github.event_name != 'pull_request'
@@ -65,9 +65,15 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: report-perf
-          path: reports
-          retention-days: 14
+          name: blob-perf
+          path: blob-report
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: lighthouse
+          path: reports/lighthouse
+          retention-days: 7
 
   load:
     if: github.event_name != 'pull_request'
@@ -78,9 +84,48 @@ jobs:
       - uses: grafana/setup-k6-action@v1
       - run: mkdir -p reports/k6
       - run: k6 run --summary-export reports/k6/summary.json perf/k6/api-load.ts
+        env:
+          K6_WEB_DASHBOARD: 'true'
+          K6_WEB_DASHBOARD_EXPORT: reports/k6/index.html
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: report-load
+          name: k6
           path: reports/k6
-          retention-days: 14
+          retention-days: 7
+
+  publish-report:
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    needs: [test, performance, load]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with: { pattern: blob-*, path: blob-reports, merge-multiple: true }
+      - run: npx playwright merge-reports --reporter html blob-reports
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: site/playwright
+      - uses: actions/download-artifact@v4
+        with: { pattern: lighthouse, path: site/lighthouse, merge-multiple: true }
+      - uses: actions/download-artifact@v4
+        with: { pattern: k6, path: site/k6, merge-multiple: true }
+      - name: Add index page
+        run: |
+          sed -e "s/__DATE__/$(date -u '+%Y-%m-%d %H:%M UTC')/" \
+              -e "s/__SHORT_COMMIT__/${GITHUB_SHA::7}/" \
+              -e "s/__COMMIT__/${GITHUB_SHA}/" \
+              -e "s#__REPO__#${GITHUB_REPOSITORY}#g" \
+              report-site/index.html > site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,42 @@
+{
+  "name": "demoblaze-e2e",
+  "version": "1.0.0",
+  "description": "Playwright tests for DemoBlaze",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:ui": "playwright test --project=chromium --project=firefox --project=webkit --project=mobile-chrome",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:api": "playwright test --project=api",
+    "test:perf": "playwright test --project=perf",
+    "report": "playwright show-report reports/html",
+    "allure:generate": "allure generate reports/allure-results -o reports/allure-report --clean",
+    "allure:open": "allure open reports/allure-report",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test:load": "mkdir -p reports/k6 && k6 run --summary-export reports/k6/summary.json perf/k6/api-load.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@faker-js/faker": "^10.0.0",
+    "@playwright/test": "1.64.0",
+    "@types/k6": "^2.3.0",
+    "@types/node": "^22.0.0",
+    "allure-commandline": "^2.34.0",
+    "allure-playwright": "^3.4.0",
+    "dotenv": "^17.0.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-playwright": "^2.2.0",
+    "lighthouse": "^13.0.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0"
+  }
+}

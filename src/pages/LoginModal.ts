@@ -1,5 +1,6 @@
 import { Locator, Page, test } from '@playwright/test';
 import { acceptAlert } from '@utils/alert';
+import { waitForModal } from '@utils/modal';
 
 export class LoginModal {
   readonly root: Locator;
@@ -17,7 +18,7 @@ export class LoginModal {
   }
 
   async fill(username: string, password: string): Promise<void> {
-    await this.root.waitFor();
+    await waitForModal(this.root);
     await this.username.fill(username);
     await this.password.fill(password);
   }

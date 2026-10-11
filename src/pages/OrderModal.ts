@@ -1,5 +1,6 @@
 import { Dialog, Locator, Page, test } from '@playwright/test';
 import type { Order } from '@data/factories';
+import { waitForModal } from '@utils/modal';
 
 export interface Confirmation {
   title: string;
@@ -36,7 +37,7 @@ export class OrderModal {
   }
 
   async fill(order: Partial<Order>): Promise<void> {
-    await this.root.waitFor();
+    await waitForModal(this.root);
     for (const [field, value] of Object.entries(order) as [keyof Order, string][]) {
       await this.fields[field].fill(value);
     }

@@ -17,7 +17,6 @@ export default tseslint.config(
       ...playwright.configs['flat/recommended'].rules,
       'playwright/no-wait-for-timeout': 'error',
       'playwright/no-force-option': 'error',
-      'playwright/no-skipped-test': ['warn', { allowConditional: true }],
     },
   },
 );

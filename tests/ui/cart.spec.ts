@@ -138,15 +138,16 @@ test.describe('Cart', { tag: ['@cart', '@regression'] }, () => {
     },
   );
 
-  test.fail(
-    'CART-10: mobile menu works on the product page',
-    knownBug('BUG-08'),
-    async ({ productPage, isMobile }) => {
-      test.skip(!isMobile, 'Mobile layout only');
-      await productPage.openById(Products.samsungGalaxyS6.id);
+  test.describe('mobile', { tag: '@mobile' }, () => {
+    test.fail(
+      'CART-10: mobile menu works on the product page',
+      knownBug('BUG-08'),
+      async ({ productPage }) => {
+        await productPage.openById(Products.samsungGalaxyS6.id);
 
-      await expect(productPage.nav.cart).toBeHidden({ timeout: 3_000 });
-      await productPage.nav.menuButton.click({ trial: true, timeout: 3_000 });
-    },
-  );
+        await expect(productPage.nav.cart).toBeHidden({ timeout: 3_000 });
+        await productPage.nav.menuButton.click({ trial: true, timeout: 3_000 });
+      },
+    );
+  });
 });

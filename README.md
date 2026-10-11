@@ -66,7 +66,7 @@ perf/k6/         k6 load test
 
 Playwright projects: `chromium`, `firefox`, `webkit`, `mobile-chrome` (Pixel 7), `api` (no browser) and `perf`.
 
-Tags: `@smoke`, `@regression`, `@login`, `@cart`, `@checkout`, `@api`, `@perf`, `@known-bug`.
+Tags: `@smoke`, `@regression`, `@login`, `@cart`, `@checkout`, `@api`, `@perf`, `@known-bug`, `@mobile`. Tests tagged `@mobile` only run on the Pixel 7 project.
 
 ## Notes on the approach
 

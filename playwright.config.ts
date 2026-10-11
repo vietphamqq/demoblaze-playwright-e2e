@@ -3,6 +3,7 @@ import { config } from './src/config/env';
 
 const launchOptions = { executablePath: config.chromiumPath };
 const uiTests = /tests\/ui\/.*\.spec\.ts/;
+const desktop = { testMatch: uiTests, grepInvert: /@mobile/ };
 
 export default defineConfig({
   testDir: './tests',
@@ -29,9 +30,9 @@ export default defineConfig({
   },
 
   projects: [
-    { name: 'chromium', testMatch: uiTests, use: { ...devices['Desktop Chrome'], launchOptions } },
-    { name: 'firefox', testMatch: uiTests, use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', testMatch: uiTests, use: { ...devices['Desktop Safari'] } },
+    { name: 'chromium', ...desktop, use: { ...devices['Desktop Chrome'], launchOptions } },
+    { name: 'firefox', ...desktop, use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', ...desktop, use: { ...devices['Desktop Safari'] } },
     { name: 'mobile-chrome', testMatch: uiTests, use: { ...devices['Pixel 7'], launchOptions } },
     { name: 'api', testMatch: /tests\/api\/.*\.spec\.ts/ },
     { name: 'perf', testMatch: /tests\/perf\/.*\.spec\.ts/, retries: 0, timeout: 180_000 },

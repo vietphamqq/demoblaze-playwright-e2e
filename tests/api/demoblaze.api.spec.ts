@@ -40,4 +40,13 @@ test.describe('API', { tag: ['@api', '@regression'] }, () => {
     await api.addToCart(user.token, 99999);
     expect(await api.getCart(user.token)).toEqual([]);
   });
+
+  test.fail(
+    'API-06: empty parameters return a handled error, not a 500',
+    knownBug('BUG-09'),
+    async ({ api }) => {
+      const res = await api.loginRaw('', '');
+      expect(res.status()).not.toBe(500);
+    },
+  );
 });

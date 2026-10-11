@@ -51,7 +51,7 @@ Note: every run overwrites `reports/html`. If you want several projects in one r
 
 ```
 src/
-  api/           API client (signup, login, products, cart)
+  api/           API client and response schemas
   components/    NavBar
   pages/         HomePage, ProductPage, CartPage, LoginModal, OrderModal
   fixtures/      page objects, api client, test users
@@ -75,6 +75,7 @@ Tags: `@smoke`, `@regression`, `@login`, `@cart`, `@checkout`, `@api`, `@perf`, 
 - Selectors live only in the page objects, so the tests read like the test cases in the sheet.
 - Each test signs up its own user through the API and empties the cart before and after, so tests can run in parallel. Cart and order tests log in by setting the session cookie; only the login tests use the form. Set `DEMO_USERNAME` and `DEMO_PASSWORD` to use a fixed account instead.
 - No fixed waits. Alert handlers are registered before the click, the cart waits for the rows returned by `/viewcart`, and navigation waits for `domcontentloaded` (in Firefox `load` sometimes took over 30 seconds on product pages).
+- API responses are checked against zod schemas (`src/api/schemas.ts`), so if the API changes shape the test fails with a clear message instead of somewhere later.
 - Each bug has a test that expects the correct behaviour, tagged `@known-bug` and marked with `test.fail()`. The suite stays green, the bug shows in the report (with a screenshot for UI tests), and once it's fixed the test fails so I know to remove the marker.
 - Config lives in `config/env/.env.<TEST_ENV>`. Local overrides go in `config/env/.env.local`, which is git-ignored.
 - Reports: the Playwright HTML report locally (trace, screenshot and video on failure), Lighthouse in `reports/lighthouse/home.html` and k6 in `reports/k6/index.html`. In CI everything is published to GitHub Pages.

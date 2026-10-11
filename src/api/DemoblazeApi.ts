@@ -1,21 +1,17 @@
 import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { config } from '@config';
-
-export interface Product {
-  id: number;
-  title: string;
-  price: number;
-  cat: string;
-  desc: string;
-  img: string;
-}
-
-export interface CartItem {
-  id: string;
-  cookie: string;
-  prod_id: number;
-}
+import {
+  CartItem,
+  CartSchema,
+  ErrorSchema,
+  Product,
+  ProductListSchema,
+  ProductSchema,
+  Session,
+  SessionSchema,
+  TokenSchema,
+} from './schemas';
 
 const NETWORK_RETRIES = 2;
 
@@ -43,26 +39,25 @@ export class DemoblazeApi {
 
   async login(username: string, password: string): Promise<string> {
     const body: unknown = await (await this.loginRaw(username, password)).json();
-    if (typeof body !== 'string' || !body.startsWith('Auth_token: ')) {
-      throw new Error(`Login failed for "${username}": ${JSON.stringify(body)}`);
-    }
-    return body.replace('Auth_token: ', '');
+    const token = TokenSchema.safeParse(body);
+    if (!token.success) throw new Error(`Login failed for "${username}": ${JSON.stringify(body)}`);
+    return token.data.replace('Auth_token: ', '');
   }
 
-  async check(token: string): Promise<{ Item?: { username: string }; errorMessage?: string }> {
-    return (await this.post('/check', { token })).json();
+  async check(token: string): Promise<Session> {
+    return SessionSchema.parse(await (await this.post('/check', { token })).json());
   }
 
   async getProducts(): Promise<Product[]> {
     const res = await this.request.get(`${this.baseUrl}/entries`, { maxRetries: NETWORK_RETRIES });
     expect(res.status()).toBe(200);
-    return (await res.json()).Items;
+    return ProductListSchema.parse(await res.json()).Items;
   }
 
   async getProduct(id: number): Promise<Product> {
     const res = await this.post('/view', { id: String(id) });
     expect(res.status()).toBe(200);
-    return res.json();
+    return ProductSchema.parse(await res.json());
   }
 
   addToCartRaw(token: string, productId: number): Promise<APIResponse> {
@@ -78,13 +73,14 @@ export class DemoblazeApi {
   }
 
   async getCart(token: string): Promise<CartItem[]> {
-    const body = await (await this.getCartRaw(token)).json();
-    if (body.errorMessage) throw new Error(`viewcart failed: ${body.errorMessage}`);
-    return body.Items;
+    const body: unknown = await (await this.getCartRaw(token)).json();
+    const error = ErrorSchema.safeParse(body);
+    if (error.success) throw new Error(`viewcart failed: ${error.data.errorMessage}`);
+    return CartSchema.parse(body).Items;
   }
 
   async getGuestCart(cookie: string): Promise<CartItem[]> {
-    return (await (await this.post('/viewcart', { cookie, flag: false })).json()).Items;
+    return CartSchema.parse(await (await this.post('/viewcart', { cookie, flag: false })).json()).Items;
   }
 
   async deleteCartItem(itemId: string): Promise<void> {

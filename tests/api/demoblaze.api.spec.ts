@@ -10,7 +10,7 @@ test.describe('API', { tag: ['@api', '@regression'] }, () => {
 
     const token = await api.login(username, password);
 
-    expect((await api.check(token)).Item?.username).toBe(username);
+    expect((await api.check(token)).Item.username).toBe(username);
   });
 
   test('API-02: login with wrong password fails', async ({ api, user }) => {

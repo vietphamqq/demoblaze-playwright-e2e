@@ -8,6 +8,12 @@ Automated tests for the Login and Cart features of [demoblaze.com](https://www.d
 - Test cases and bugs: [Google Sheet](https://docs.google.com/spreadsheets/d/1Po4H9u4_cFwjMFUTjdUKemLtL19jO8LmpKfadKfAXwE/edit?usp=sharing)
 - CI: [GitHub Actions](.github/workflows/e2e.yml)
 
+## Demo
+
+The end-to-end flow from the assignment (log in, add to cart, place an order), test `ORDER-01`:
+
+![Login, add to cart and place an order](docs/demo/order-01.gif)
+
 ## Setup
 
 You need Node.js 20 or newer (I used 22, see `.nvmrc`).

@@ -96,20 +96,16 @@ On main and nightly runs the last job merges the Playwright results from all job
 
 ## Bugs found
 
-The site has no written requirements, so in a couple of cases the expected behaviour is my own assumption. Those are marked in the sheet.
+I found 8 bugs. The main ones:
 
-| ID     | Severity | Bug                                                                                              | Test     |
-| ------ | -------- | ------------------------------------------------------------------------------------------------ | -------- |
-| BUG-01 | High     | You can place an order with an empty cart (Amount: 0 USD)                                        | ORDER-06 |
-| BUG-02 | Medium   | The order date shows last month (`getMonth()` starts at 0)                                       | ORDER-07 |
-| BUG-03 | High     | Card number, month and year aren't validated (assumed requirement)                               | ORDER-08 |
-| BUG-04 | High     | Guests who open a product link directly all share one cart                                       | CART-09  |
-| BUG-05 | High     | Orders are never sent to the server, the order id is just a random number from the browser       | ORDER-10 |
-| BUG-06 | Low      | The confirmation shows the full card number                                                      | ORDER-09 |
-| BUG-07 | Medium   | The API accepts a product id that doesn't exist                                                  | API-05   |
-| BUG-08 | Medium   | On mobile the menu on the product and cart pages doesn't collapse and the menu button is covered | CART-10  |
+| ID     | Severity | Bug                                                                                        | Test     |
+| ------ | -------- | ------------------------------------------------------------------------------------------ | -------- |
+| BUG-01 | High     | You can place an order with an empty cart (Amount: 0 USD)                                  | ORDER-06 |
+| BUG-04 | High     | Guests who open a product link directly all share one cart                                 | CART-09  |
+| BUG-05 | High     | Orders are never sent to the server, the order id is just a random number from the browser | ORDER-10 |
+| BUG-02 | Medium   | The order date shows last month (`getMonth()` starts at 0)                                 | ORDER-07 |
 
-Steps to reproduce are in the Bugs tab of the sheet.
+The full list with steps to reproduce is in the [Bugs tab of the sheet](https://docs.google.com/spreadsheets/d/1Po4H9u4_cFwjMFUTjdUKemLtL19jO8LmpKfadKfAXwE/edit#gid=12). The site has no written requirements, so for a couple of them the expected behaviour is my own assumption; those are marked there.
 
 ## What I'd add with more time
 

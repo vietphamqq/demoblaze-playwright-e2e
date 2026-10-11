@@ -20,6 +20,12 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+  page: async ({ page }, use, testInfo) => {
+    await use(page);
+    if (testInfo.tags.includes('@known-bug') && testInfo.status !== 'skipped') {
+      await testInfo.attach('screenshot', { body: await page.screenshot(), contentType: 'image/png' });
+    }
+  },
   api: async ({ request }, use) => use(new DemoblazeApi(request)),
   homePage: async ({ page }, use) => use(new HomePage(page)),
   productPage: async ({ page }, use) => use(new ProductPage(page)),

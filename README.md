@@ -81,7 +81,7 @@ There are no fixed waits. DemoBlaze loads almost everything with AJAX, so I wait
 - Navigation waits for `domcontentloaded` rather than `load`. Product pages load a video player and in Firefox `load` sometimes took over 30 seconds.
 - Purchase: after clicking it, the order form waits for either the confirmation popup or an alert, so a negative test can't pass by checking too early.
 
-Bugs I found have a test that expects the correct behaviour, tagged `@known-bug` and marked with `test.fail()`. That way the suite stays green but the bug is visible in the report, and once it gets fixed the test fails and reminds me to remove the marker.
+Bugs I found have a test that expects the correct behaviour, tagged `@known-bug` and marked with `test.fail()`. That way the suite stays green but the bug is visible in the report, and once it gets fixed the test fails and reminds me to remove the marker. UI tests for known bugs also attach a screenshot of the page, so you can see the bug straight from the report.
 
 Config (URLs, retries, video, credentials, performance budgets) lives in `config/env/.env.<TEST_ENV>`. Local overrides go in `config/env/.env.local`, which is git-ignored.
 

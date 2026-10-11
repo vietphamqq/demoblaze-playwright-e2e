@@ -12,6 +12,10 @@ on:
         description: 'Tag to run, e.g. @smoke or @regression'
         default: '@regression'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   CI: 'true'
   GREP: ${{ inputs.grep || (github.event_name == 'pull_request' && '@smoke' || '@regression') }}

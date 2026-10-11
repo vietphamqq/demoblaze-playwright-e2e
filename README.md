@@ -91,7 +91,7 @@ Tags: `@smoke`, `@regression`, `@login`, `@cart`, `@checkout`, `@api`, `@perf`, 
 - On main and nightly: the full `@regression` set, plus Lighthouse and k6.
 - It can also be started manually with a tag.
 
-Failed tests are retried twice in CI.
+Failed tests are retried twice in CI, and a new push cancels the older run on the same branch.
 
 On main and nightly runs the last job merges the Playwright results from all jobs into one report and publishes it to [GitHub Pages](https://vietphamqq.github.io/demoblaze-playwright-e2e/), together with the Lighthouse report and the k6 dashboard. Traces can be opened straight from there. If you fork this, turn it on under Settings → Pages → Source: GitHub Actions.
 

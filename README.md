@@ -1,5 +1,7 @@
 # DemoBlaze E2E Tests
 
+[![E2E](https://github.com/vietphamqq/demoblaze-playwright-e2e/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/vietphamqq/demoblaze-playwright-e2e/actions/workflows/e2e.yml)
+
 Automated tests for the Login and Cart features of [demoblaze.com](https://www.demoblaze.com/), written with Playwright and TypeScript.
 
 - Latest test report: [vietphamqq.github.io/demoblaze-playwright-e2e](https://vietphamqq.github.io/demoblaze-playwright-e2e/)
@@ -70,29 +72,17 @@ Tags: `@smoke`, `@regression`, `@login`, `@cart`, `@checkout`, `@api`, `@perf`, 
 
 ## Notes on the approach
 
-I kept selectors inside the page objects only, so the tests read close to the test cases in the sheet.
-
-Each test gets its own user. The `user` fixture signs up a new account through the API and empties the cart before and after the test, so tests can run in parallel without stepping on each other. Most cart and order tests use `loggedIn`, which just sets the session cookie, so only the login tests actually go through the login form. If you'd rather use a fixed account, set `DEMO_USERNAME` and `DEMO_PASSWORD`. (Creating accounts like this is fine on a demo site, I wouldn't do it on a shared environment.)
-
-There are no fixed waits. DemoBlaze loads almost everything with AJAX, so I wait for the real signals instead:
-
-- Alerts: the handler is registered before the click. Some alerts block the page immediately, and waiting for them after the click just hangs.
-- Cart: the page waits until the number of rows matches what `/viewcart` returned. Without this, an "empty cart" check can pass before the rows are drawn.
-- Navigation waits for `domcontentloaded` rather than `load`. Product pages load a video player and in Firefox `load` sometimes took over 30 seconds.
-- Purchase: after clicking it, the order form waits for either the confirmation popup or an alert, so a negative test can't pass by checking too early.
-
-Bugs I found have a test that expects the correct behaviour, tagged `@known-bug` and marked with `test.fail()`. That way the suite stays green but the bug is visible in the report, and once it gets fixed the test fails and reminds me to remove the marker. UI tests for known bugs also attach a screenshot of the page, so you can see the bug straight from the report.
-
-Config (URLs, retries, video, credentials, performance budgets) lives in `config/env/.env.<TEST_ENV>`. Local overrides go in `config/env/.env.local`, which is git-ignored.
-
-Reports: locally you get the console output and the Playwright HTML report (with trace, screenshot and video on failure). Lighthouse writes to `reports/lighthouse/home.html` and k6 to `reports/k6/index.html`. In CI everything ends up on GitHub Pages, see below.
+- Selectors live only in the page objects, so the tests read like the test cases in the sheet.
+- Each test signs up its own user through the API and empties the cart before and after, so tests can run in parallel. Cart and order tests log in by setting the session cookie; only the login tests use the form. Set `DEMO_USERNAME` and `DEMO_PASSWORD` to use a fixed account instead.
+- No fixed waits. Alert handlers are registered before the click, the cart waits for the rows returned by `/viewcart`, and navigation waits for `domcontentloaded` (in Firefox `load` sometimes took over 30 seconds on product pages).
+- Each bug has a test that expects the correct behaviour, tagged `@known-bug` and marked with `test.fail()`. The suite stays green, the bug shows in the report (with a screenshot for UI tests), and once it's fixed the test fails so I know to remove the marker.
+- Config lives in `config/env/.env.<TEST_ENV>`. Local overrides go in `config/env/.env.local`, which is git-ignored.
+- Reports: the Playwright HTML report locally (trace, screenshot and video on failure), Lighthouse in `reports/lighthouse/home.html` and k6 in `reports/k6/index.html`. In CI everything is published to GitHub Pages.
 
 ### Performance
 
-I split it into two checks:
-
-- **Lighthouse** on the home page, checked against the budgets in the env file. It runs in its own Node process because it kept crashing inside the Playwright worker on Node 23.
-- **k6** for the API: 5 virtual users for 30 seconds, each one lists products, opens one, adds it to the cart and loads the cart. It fails if p95 goes over 1500 ms, more than 1% of requests fail or a check fails. I kept the load small on purpose since this is a public demo site. You can raise it with `VUS=10 DURATION=1m npm run test:load`.
+- **Lighthouse** on the home page, checked against the budgets in the env file. It runs in its own Node process because it crashed inside the Playwright worker on Node 23.
+- **k6** for the API: 5 virtual users for 30 seconds browsing products, adding to cart and loading the cart. It fails if p95 is over 1500 ms, more than 1% of requests fail or a check fails. The load is small on purpose since this is a public demo site; raise it with `VUS=10 DURATION=1m npm run test:load`.
 
 ## CI
 

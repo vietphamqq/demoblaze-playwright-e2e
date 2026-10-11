@@ -18,8 +18,11 @@ export class HomePage extends BasePage {
   }
 
   async login(username: string, password: string): Promise<void> {
-    await this.nav.openLogin();
-    await this.loginModal.login(username, password);
+    await test.step(`log in as ${username}`, async () => {
+      await this.nav.openLogin();
+      await this.loginModal.submit(username, password);
+      await this.nav.welcome.waitFor();
+    });
   }
 
   async filterByCategory(category: 'Phones' | 'Laptops' | 'Monitors'): Promise<void> {

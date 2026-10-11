@@ -22,13 +22,9 @@ export class LoginModal {
     await this.password.fill(password);
   }
 
-  async login(username: string, password: string): Promise<void> {
-    await test.step(`log in as ${username}`, async () => {
-      await this.fill(username, password);
-      const reloaded = this.page.waitForEvent('domcontentloaded');
-      await this.loginButton.click();
-      await reloaded;
-    });
+  async submit(username: string, password: string): Promise<void> {
+    await this.fill(username, password);
+    await this.loginButton.click();
   }
 
   async loginAndGetAlert(username: string, password: string): Promise<string> {

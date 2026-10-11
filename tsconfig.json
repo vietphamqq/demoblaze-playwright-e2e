@@ -20,6 +20,7 @@
       "@fixtures": ["src/fixtures/index.ts"],
       "@data/*": ["src/data/*"],
       "@utils/*": ["src/utils/*"],
+      "@flows/*": ["src/flows/*"],
       "@config": ["src/config/env.ts"]
     }
   },

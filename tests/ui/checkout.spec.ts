@@ -2,6 +2,7 @@ import { test, expect, knownBug } from '@fixtures';
 import { Messages } from '@data/messages';
 import { Products } from '@data/products';
 import { randomOrder } from '@data/factories';
+import { openProductFromHome } from '@flows/cart';
 import { sum } from '@utils/price';
 
 test.describe('Place order', { tag: ['@checkout', '@regression'] }, () => {
@@ -9,40 +10,46 @@ test.describe('Place order', { tag: ['@checkout', '@regression'] }, () => {
     'ORDER-01: login, add to cart and place an order',
     { tag: ['@smoke', '@e2e'] },
     async ({ homePage, productPage, cartPage, user, api }) => {
+      const products = [Products.samsungGalaxyS6, Products.sonyVaioI5];
+
       await homePage.open();
       await homePage.login(user.username, user.password);
       await expect(homePage.nav.welcome).toHaveText(Messages.login.welcome(user.username));
 
-      const products = [Products.samsungGalaxyS6, Products.sonyVaioI5];
       const prices: number[] = [];
       for (const product of products) {
-        await homePage.open();
-        await homePage.openProduct(product.title);
+        await openProductFromHome(homePage, productPage, product.title);
         await expect(productPage.name).toHaveText(product.title);
         prices.push(await productPage.getPrice());
         expect(await productPage.addToCart()).toBe(Messages.cart.productAdded);
       }
       const total = sum(prices);
 
-      await cartPage.loadAfter(() => homePage.nav.openCart());
-      const titles = (await cartPage.getRows()).map((row) => row.title);
-      expect(titles.sort()).toEqual(products.map((p) => p.title).sort());
-      await expect(cartPage.total).toHaveText(String(total));
+      await test.step('check the cart', async () => {
+        await cartPage.loadAfter(() => homePage.nav.openCart());
+        const titles = (await cartPage.getRows()).map((row) => row.title);
+        expect(titles.sort()).toEqual(products.map((p) => p.title).sort());
+        await expect(cartPage.total).toHaveText(String(total));
+      });
 
       const order = randomOrder();
       const orderModal = await cartPage.openPlaceOrder();
       await expect(orderModal.total).toHaveText(`Total: ${total}`);
       const confirmation = await orderModal.purchase(order);
 
-      expect(confirmation.title).toBe(Messages.order.thankYou);
-      expect(confirmation.id).toMatch(/^\d+$/);
-      expect(confirmation.amount).toBe(total);
-      expect(confirmation.name).toBe(order.name);
+      await test.step('check the confirmation', async () => {
+        expect(confirmation.title).toBe(Messages.order.thankYou);
+        expect(confirmation.id).toMatch(/^\d+$/);
+        expect(confirmation.amount).toBe(total);
+        expect(confirmation.name).toBe(order.name);
+      });
 
-      await orderModal.closeConfirmation();
-      await cartPage.open();
-      await expect(cartPage.rows).toHaveCount(0);
-      expect(await api.getCart(user.token)).toHaveLength(0);
+      await test.step('cart is empty after the order', async () => {
+        await orderModal.closeConfirmation();
+        await cartPage.open();
+        await expect(cartPage.rows).toHaveCount(0);
+        expect(await api.getCart(user.token)).toHaveLength(0);
+      });
     },
   );
 
@@ -129,5 +136,18 @@ test.describe('Place order', { tag: ['@checkout', '@regression'] }, () => {
 
       expect(requests.some((path) => /order|purchase|checkout/i.test(path))).toBe(true);
     });
+
+    test.fail(
+      'ORDER-11: no confirmation when the order request fails',
+      knownBug('BUG-10'),
+      async ({ cartPage }) => {
+        await cartPage.page.route('**/deletecart', (route) => route.abort());
+        const orderModal = await cartPage.openPlaceOrder();
+
+        const result = await orderModal.submit(randomOrder());
+
+        expect(result.kind).toBe('alert');
+      },
+    );
   });
 });

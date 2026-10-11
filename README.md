@@ -57,11 +57,12 @@ src/
   fixtures/      page objects, api client, test users
   data/          messages, products, test data
   utils/         alert and price helpers
+  flows/         steps that span more than one page
   perf/          Lighthouse runner
   config/        env config
 tests/
-  ui/            login, cart and checkout (30 tests)
-  api/           API tests (5)
+  ui/            login, cart and checkout (31 tests)
+  api/           API tests (6)
   perf/          Lighthouse (1)
 perf/k6/         k6 load test
 ```
@@ -97,7 +98,7 @@ On main and nightly runs the last job merges the Playwright results from all job
 
 ## Bugs found
 
-I found 8 bugs. The main ones:
+I found 10 bugs. The main ones:
 
 | ID     | Severity | Bug                                                                                        | Test     |
 | ------ | -------- | ------------------------------------------------------------------------------------------ | -------- |

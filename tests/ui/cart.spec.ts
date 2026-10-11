@@ -4,6 +4,7 @@ import { Products } from '@data/products';
 import { HomePage } from '@pages/HomePage';
 import { CartPage } from '@pages/CartPage';
 import { sum } from '@utils/price';
+import { openProductFromHome } from '@flows/cart';
 
 test.describe('Cart', { tag: ['@cart', '@regression'] }, () => {
   test(
@@ -90,9 +91,7 @@ test.describe('Cart', { tag: ['@cart', '@regression'] }, () => {
   });
 
   test('CART-07: guest can add to cart', async ({ homePage, productPage, cartPage }) => {
-    await homePage.open();
-    await homePage.openProduct(Products.nokiaLumia1520.title);
-    await productPage.waitForLoad();
+    await openProductFromHome(homePage, productPage, Products.nokiaLumia1520.title);
 
     expect(await productPage.addToCart()).toMatch(/^Product added\.?$/);
 
